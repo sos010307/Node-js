@@ -31,7 +31,7 @@ var app = http.createServer(function(request,response){
     var queryData = url.parse(_url, true).query;
     var pathname = url.parse(_url,true).pathname;
     
-    console.log(url.parse(_url, true));
+    // console.log(url.parse(_url, true));
     if(pathname === "/"){
       if(queryData.id === undefined){
 
