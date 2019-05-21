@@ -66,7 +66,6 @@ var app = http.createServer(function(request,response){
     }else if(pathname == "/create"){
       fs.readdir('./data', function(err, filelist){
         var title = 'Welcome';
-        var description = 'Hello, Node.js';
         var list = templist(filelist);
         var template = temp(title, list, `
           <form action="http://localhost:3000/create_process" method="post">
@@ -92,6 +91,27 @@ var app = http.createServer(function(request,response){
         fs.writeFile(`data/${title}`, description, 'utf8', function(err){
           response.writeHead(302, {Location:`/?id=${title}`});
           response.end();
+        })
+      })
+    }else if(pathname == "/update"){
+      fs.readdir('./data', function(err, filelist){
+        fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description){
+          var title = queryData.id;
+          var list = templist(filelist);
+          var template = temp(title, list,
+           `
+          <form action="http://localhost:3000/update_process" method="post">
+          <input type="hidden" name="id" value="${title}">
+            <p><input type="text" name="title" placeholder="title" value="${title}"></p>
+            <p>
+              <textarea name="description" placeholder="description">${description}</textarea>
+            </p>
+            <p><button type="submit">submit</button></p>
+          </form>
+           `
+           );
+          response.writeHead(200);
+          response.end(template);
         })
       })
     }else{
