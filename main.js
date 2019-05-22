@@ -1,31 +1,33 @@
 var http = require('http');
 var fs = require('fs');
 var url = require('url');
-var qs = require("querystring")
+var qs = require("querystring");
 
-function temp(title, list, body, control){
-  return `
-            <!DOCTYPE html>
-              <html>
-              <head>
-                <title>WEB1 - ${title}</title>
-                <meta charset="utf-8">
-              </head>
-              <body>
-                <h1><a href="/">WEB2</a></h1>
-                ${list}
-                ${control}
-                ${body}
-              </body>
-              </html>
-          `;
-}
-function templist(filelist){
-  var list = `<ul>`;
-  for(var i=0; i<filelist.length; i++)
-    list += `<li><a href="/?id=${filelist[i]}">${filelist[i]}</a></li>`;
-  list += `</ul>`;
-  return list;
+var temp = {
+  html:function (title, list, body, control){
+    return `
+              <!DOCTYPE html>
+                <html>
+                <head>
+                  <title>WEB1 - ${title}</title>
+                  <meta charset="utf-8">
+                </head>
+                <body>
+                  <h1><a href="/">WEB2</a></h1>
+                  ${list}
+                  ${control}
+                  ${body}
+                </body>
+                </html>
+            `;
+  },
+  list:function (filelist){
+    var list = `<ul>`;
+    for(var i=0; i<filelist.length; i++)
+      list += `<li><a href="/?id=${filelist[i]}">${filelist[i]}</a></li>`;
+    list += `</ul>`;
+    return list;
+  }
 }
 
 var app = http.createServer(function(request,response){
@@ -40,8 +42,8 @@ var app = http.createServer(function(request,response){
         fs.readdir('./data', function(err, filelist){
           var title = 'Welcome';
           var description = 'Hello, Node.js';
-          var list = templist(filelist);
-          var template = temp(title, list, 
+          var list = temp.list(filelist);
+          var template = temp.html(title, list, 
             `<h2>${title}</h2>${description}`,
             `<a href="/create">create</a>`
             );
@@ -53,8 +55,8 @@ var app = http.createServer(function(request,response){
         fs.readdir('./data', function(err, filelist){
           fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description){
             var title = queryData.id;
-            var list = templist(filelist);
-            var template = temp(title, list,
+            var list = temp.list(filelist);
+            var template = temp.html(title, list,
              `<h2>${title}</h2>${description}`,
             `<a href="/create">create</a> <a href="/update?id=${title}">update</a>
             <form action="delete_process" method="post">
@@ -70,8 +72,8 @@ var app = http.createServer(function(request,response){
     }else if(pathname == "/create"){
       fs.readdir('./data', function(err, filelist){
         var title = 'Welcome';
-        var list = templist(filelist);
-        var template = temp(title, list, `
+        var list = temp.list(filelist);
+        var template = temp.html(title, list, `
           <form action="http://localhost:3000/create_process" method="post">
             <p><input type="text" name="title" placeholder="title"></p>
             <p>
@@ -101,8 +103,8 @@ var app = http.createServer(function(request,response){
       fs.readdir('./data', function(err, filelist){
         fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description){
           var title = queryData.id;
-          var list = templist(filelist);
-          var template = temp(title, list,
+          var list = temp.list(filelist);
+          var template = temp.html(title, list,
            `
           <form action="http://localhost:3000/update_process" method="post">
           <input type="hidden" name="id" value="${title}">
